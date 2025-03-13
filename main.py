@@ -2,8 +2,8 @@ from curses import wrapper
 import curses
 from random import randint
 
-from aux import bit_updater
-from l_print import big_num_printing, little_num_printing, score_printing
+from aux_functions import bit_updater
+from print_functions import big_num_printing, little_num_printing, score_printing
 
 
 def main(screen):

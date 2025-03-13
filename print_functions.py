@@ -1,6 +1,6 @@
 
 from curses import color_pair
-from aux import box_layers, big_num_layer, little_num_layer
+from aux_functions import box_layers, big_num_layer, little_num_layer
 
 def big_num_printing(challenge: int, y_offset: int, x_offset: int, screen) -> None:
     for back_layer in range(7): # shadow & background
