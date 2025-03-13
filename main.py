@@ -5,51 +5,50 @@ from random import randint
 from aux_functions import big_num_layer, little_num_layer, box_layers, bit_updater
 
 def big_num_printing(challenge: int, y_offset: int, x_offset: int, screen) -> None:
-    for layer in range(7): # shadow & background
-        screen.addstr(layer+y_offset+1, x_offset, \
-            " "*18, curses.color_pair(3))
-        screen.addstr(layer+y_offset, x_offset-1, \
-            " "*18, curses.color_pair(5)) 
-    # basically, print red background whereever there's a #
-    for layer in range(5):
-        curr_layer: str = big_num_layer(challenge, layer)
-        for idx, letter in enumerate(curr_layer):
-            if letter != '#': continue
-            screen.addch(layer+y_offset+1, x_offset+idx+1, \
-                '#', curses.color_pair(4))
+    for back_layer in range(7): # shadow & background
+        settings = lambda i,j, k: (back_layer+i, j, " "*18, curses.color_pair(k))
+        screen.addstr(*settings(y_offset+1, x_offset, 3))
+        screen.addstr(*settings(y_offset, x_offset-1, 5))
+
+    for fore_layer in range(5): # red background where text
+        curr_layer: str = big_num_layer(challenge, fore_layer)
+        indices = [idx for idx, i in enumerate(curr_layer) if i == '#']
+        for idx in indices:
+            settings = (fore_layer+y_offset+1, x_offset+idx+1)
+            screen.addch(*settings, '#', curses.color_pair(4))
 
 def little_num_printing(curr_guess: list[int], y_offset: int, x_offset: int, screen) -> None:
     length: int = 35
-    for layer in range(5): # background 
-        if layer == 0:   curr_layer = box_layers(0, length)
-        elif layer == 4: curr_layer = box_layers(2, length)
+    for back_layer in range(5): # background         
+        if back_layer == 0:   curr_layer = box_layers(0, length)
+        elif back_layer == 4: curr_layer = box_layers(2, length)
         else:            curr_layer = box_layers(1, length)
         
-        screen.addstr(y_offset+layer-1, x_offset-2, \
-            curr_layer, curses.color_pair(6))
+        location = (y_offset+back_layer-1, x_offset-2) 
+        screen.addstr(*location, curr_layer, curses.color_pair(6))
 
-    for layer in range(3):
-        curr_layer: str = little_num_layer(curr_guess, layer)
-        for idx, letter in enumerate(curr_layer):
-            if letter != '#':
-                continue
-            using_idx = idx if idx < 15 else idx + 2
-            screen.addch(y_offset+layer, (x_offset) + using_idx, letter, \
-                curses.color_pair(3))
+    for fore_layer in range(3):
+        curr_layer: str = little_num_layer(curr_guess, fore_layer)
+        indices = [idx for idx, i in enumerate(curr_layer) if i == '#']
+        for idx in indices:
+            if idx >= 15: idx += 2
+            settings = (y_offset+fore_layer, x_offset+idx)
+            screen.addch(*settings, '#', curses.color_pair(3))
 
 def score_printing(score: int, y_offset: int, x_offset: int, screen):
     length: int = 16
-    for layer in range(7): # background
-        if layer == 0:   curr_layer = box_layers(0, length)
-        elif layer == 6: curr_layer = box_layers(2, length)
+    for back_layer in range(7): # background
+        if back_layer == 0:   curr_layer = box_layers(0, length)
+        elif back_layer == 6: curr_layer = box_layers(2, length)
         else:            curr_layer = box_layers(1, length)
-        screen.addstr(y_offset-1+layer, x_offset-2, curr_layer, curses.color_pair(7))
+        location = (y_offset+back_layer-1, x_offset-2)
+        screen.addstr(*location, curr_layer, curses.color_pair(7))
 
-    for layer in range(5):
-        curr_layer = big_num_layer(score, layer)
+    for fore_layer in range(5):
+        curr_layer = big_num_layer(score, fore_layer)
         for idx, letter in enumerate(curr_layer):
             if letter != '#': continue
-            screen.addch(y_offset+layer,x_offset+idx, ' ', curses.color_pair(0))
+            screen.addch(y_offset+fore_layer,x_offset+idx, ' ', curses.color_pair(0))
 
 
 
@@ -61,12 +60,12 @@ def main(screen):
     curses.init_pair(3, 0, 0)       # black shadow & little_num text
     curses.init_pair(4, 196, 196)   # pure red for big_num
     curses.init_pair(5, 196, 223)   # beige-y background for big_num
-    curses.init_pair(6, 0, 15)      # white on black for boxed background
-    
-    curses.init_color(255, 400, 631, 509) # green
-    curses.init_color(254, 376, 286, 352) # eggshell
+    curses.init_pair(6, 0, 15)      # white on black for boxed background 
 
-    curses.init_pair(7, 255, 254)      # eggplant on green for score
+    curses.init_color(7, 376, 286, 352) # eggshell
+    curses.init_color(8, 400, 631, 509) # green
+
+    curses.init_pair(7, 8, 7)      # eggplant on green for score
 
     screen.bkgd(' ', curses.color_pair(1))
 
